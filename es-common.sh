@@ -37,7 +37,7 @@ function check_es_index_exists {
 
     info "Checking whether index with name '${index}' exists on server '${server}'"
 
-    local es_url="http://${server}:${ELASTICSEARCH_PORT}/${index}"
+    local es_url="http://${server}/${index}"
 
     if run curl ${CURL_OPTIONS} ${ELASTICSEARCH_CREDENTIALS} -X GET "${es_url}" > /dev/null 2>&1; then
         bail "An index with name '${index}' exists on server '${server}', please remove it before restoring"
@@ -50,7 +50,7 @@ function check_es_needs_configuration {
 
     info "Checking if snapshot repository with name '${ELASTICSEARCH_REPOSITORY_NAME}' exists on server '${server}'"
 
-    local es_url="http://${server}:${ELASTICSEARCH_PORT}/_snapshot/${ELASTICSEARCH_REPOSITORY_NAME}"
+    local es_url="http://${server}/_snapshot/${ELASTICSEARCH_REPOSITORY_NAME}"
     if run curl ${CURL_OPTIONS} ${ELASTICSEARCH_CREDENTIALS} -X GET "${es_url}" > /dev/null 2>&1; then
         debug "The snapshot repository '${ELASTICSEARCH_REPOSITORY_NAME}' already exists on server '${server}'"
     else
@@ -85,7 +85,7 @@ EOF
 )
     info "Creating Elasticsearch S3 snapshot repository with name '${ELASTICSEARCH_REPOSITORY_NAME}' on server '${server}'"
 
-    local es_url="http://${server}:${ELASTICSEARCH_PORT}/_snapshot/${ELASTICSEARCH_REPOSITORY_NAME}"
+    local es_url="http://${server}/_snapshot/${ELASTICSEARCH_REPOSITORY_NAME}"
     local es_response=$(run curl -s ${ELASTICSEARCH_CREDENTIALS} -X PUT "${es_url}" -d "${create_s3_repository}")
 
     if [ "$(echo ${es_response} | jq -r '.acknowledged')" != "true" ]; then
@@ -116,7 +116,7 @@ EOF
 )
     info "Creating Elasticsearch shared filesystem snapshot repository with name '${ELASTICSEARCH_REPOSITORY_NAME}' on server '${server}'"
 
-    local es_url="http://${server}:${ELASTICSEARCH_PORT}/_snapshot/${ELASTICSEARCH_REPOSITORY_NAME}"
+    local es_url="http://${server}/_snapshot/${ELASTICSEARCH_REPOSITORY_NAME}"
     local es_response=$(run curl -s ${ELASTICSEARCH_CREDENTIALS} -X PUT "${es_url}" -d "${create_fs_repository}")
 
     if [ "$(echo ${es_response} | jq -r '.acknowledged')" != "true" ]; then
@@ -142,7 +142,7 @@ function create_es_snapshot {
 EOF
 )
     local snapshot_name="${SNAPSHOT_TAG_VALUE}"
-    local es_url="http://${server}:${ELASTICSEARCH_PORT}/_snapshot/${ELASTICSEARCH_REPOSITORY_NAME}/${snapshot_name}"
+    local es_url="http://${server}/_snapshot/${ELASTICSEARCH_REPOSITORY_NAME}/${snapshot_name}"
 
     debug "Creating Elasticsearch snapshot '${snapshot_name}' on server '${server}'"
 
@@ -161,7 +161,7 @@ function delete_es_snapshot {
 
     debug "Deleting Elasticsearch snapshot '${snapshot_name}' on server '${server}'"
 
-    local delete_url="http://${server}:${ELASTICSEARCH_PORT}/_snapshot/${ELASTICSEARCH_REPOSITORY_NAME}/${snapshot_name}"
+    local delete_url="http://${server}/_snapshot/${ELASTICSEARCH_REPOSITORY_NAME}/${snapshot_name}"
     if ! run curl -s ${ELASTICSEARCH_CREDENTIALS} -X DELETE "${delete_url}" > /dev/null 2>&1; then
         bail "Unable to delete snapshot '${snapshot_name}' on server '${server}'"
     fi
@@ -186,7 +186,7 @@ EOF
     debug "Restoring Elasticsearch snapshot '${snapshot_name}' on server '${server}'"
 
     # Begin the restore
-    local restore_url="http://${server}:${ELASTICSEARCH_PORT}/_snapshot/${ELASTICSEARCH_REPOSITORY_NAME}/${snapshot_name}/_restore"
+    local restore_url="http://${server}/_snapshot/${ELASTICSEARCH_REPOSITORY_NAME}/${snapshot_name}/_restore"
     local es_response=$(run curl -s ${ELASTICSEARCH_CREDENTIALS} -X POST "${restore_url}" -d "${snapshot_body}")
     if [ "$(echo ${es_response} | jq -r '.snapshot.snapshot')" != "${snapshot_name}" ]; then
         if [ "$(echo ${es_response} | jq -r '.accepted')" != "true" ]; then
@@ -202,7 +202,7 @@ EOF
 function get_es_snapshots {
     local server="$1"
 
-    local snapshots_url="http://${server}:${ELASTICSEARCH_PORT}/_snapshot/${ELASTICSEARCH_REPOSITORY_NAME}/_all"
+    local snapshots_url="http://${server}/_snapshot/${ELASTICSEARCH_REPOSITORY_NAME}/_all"
     local es_response=$(run curl -s ${ELASTICSEARCH_CREDENTIALS} -X GET "${snapshots_url}")
     local snapshots=$(echo ${es_response} | jq -r '.[] | sort_by(.start_time_in_millis) | .[]  | .snapshot')
 
