@@ -18,7 +18,7 @@ source "${SCRIPT_DIR}/common.sh"
 source_archive_strategy
 source_database_strategy
 source_disk_strategy
-source_elasticsearch_strategy
+# source_elasticsearch_strategy
 
 # Ensure we know which user:group things should be owned as
 if [ -z "${BITBUCKET_UID}" -o -z "${BITBUCKET_GID}" ]; then
@@ -39,7 +39,7 @@ info "Preparing for restore"
 
 prepare_restore_disk "${1}"
 prepare_restore_db "${1}"
-prepare_restore_elasticsearch "${1}"
+# prepare_restore_elasticsearch "${1}"
 
 if [ -n "${BACKUP_ARCHIVE_TYPE}" ]; then
     restore_archive
@@ -54,7 +54,7 @@ restore_disk "${1}"
 restore_db
 
 # Restore Elasticsearch data
-restore_elasticsearch
+# restore_elasticsearch
 
 success "Successfully completed the restore of your ${PRODUCT} instance"
 
