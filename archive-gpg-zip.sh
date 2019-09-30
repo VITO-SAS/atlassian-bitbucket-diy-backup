@@ -33,8 +33,8 @@ function prepare_restore_archive {
 
     # Setup restore paths
     BITBUCKET_RESTORE_ROOT=$(mktemp -d /tmp/bitbucket.diy-restore.XXXXXX)
-    BITBUCKET_RESTORE_DB="${BITBUCKET_RESTORE_ROOT}/bitbucket-db"
-    BITBUCKET_RESTORE_HOME="${BITBUCKET_RESTORE_ROOT}/bitbucket-home"
+    BITBUCKET_RESTORE_DB="${BITBUCKET_RESTORE_ROOT}/jira-db"
+    BITBUCKET_RESTORE_HOME="${BITBUCKET_RESTORE_ROOT}/jira-home"
     BITBUCKET_RESTORE_DATA_STORES="${BITBUCKET_RESTORE_ROOT}/bitbucket-data-stores"
 }
 

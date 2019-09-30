@@ -32,8 +32,8 @@ BITBUCKET_BACKUP_EXCLUDE_REPOS=()
 # PostgreSQL configuration
 BITBUCKET_DB=jira
 POSTGRES_HOST=localhost
-POSTGRES_USERNAME=atljira
-export PGPASSWORD=Postgres1%
+POSTGRES_USERNAME=postgres
+export PGPASSWORD=jirapassword
 POSTGRES_PORT=5432
 
 # Make use of PostgreSQL 9.3+ options if available
