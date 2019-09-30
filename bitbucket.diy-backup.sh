@@ -18,27 +18,27 @@ source "${SCRIPT_DIR}/common.sh"
 source_archive_strategy
 source_database_strategy
 source_disk_strategy
-source_elasticsearch_strategy
+# source_elasticsearch_strategy
 
-# Ensure compatibility if BACKUP_ZERO_DOWNTIME is set
-if [ "${BACKUP_ZERO_DOWNTIME}" = "true" ]; then
-    if [ "${BACKUP_DISK_TYPE}" = "rsync" ]; then
-        error "BACKUP_DISK_TYPE=rsync cannot be used with BACKUP_ZERO_DOWNTIME=true"
-        bail "Please update ${BACKUP_VARS_FILE}"
-    fi
-    version=($(bitbucket_version))
-    if [ "${#version[@]}" -lt 2 ]; then
-        error "Unable to determine the version of Bitbucket at '${BITBUCKET_URL}'"
-        error "You need a minimum of Bitbucket 4.8 to restore a backup taken with BACKUP_ZERO_DOWNTIME=true"
-        error "See https://confluence.atlassian.com/display/BitbucketServer/Using+Bitbucket+Zero+Downtime+Backup."
-        bail "Please update ${BACKUP_VARS_FILE}"
-    elif [ "${version[0]}" -lt 4 -o "${version[0]}" -eq 4 -a "${version[1]}" -lt 8 ]; then
-        error "Bitbucket version ${version[0]}.${version[1]} does not support BACKUP_ZERO_DOWNTIME=true"
-        error "You need a minimum of Bitbucket 4.8 to restore a backup taken with BACKUP_ZERO_DOWNTIME=true"
-        error "See https://confluence.atlassian.com/display/BitbucketServer/Using+Bitbucket+Zero+Downtime+Backup."
-        bail "Please update ${BACKUP_VARS_FILE}"
-    fi
-fi
+# # Ensure compatibility if BACKUP_ZERO_DOWNTIME is set
+# if [ "${BACKUP_ZERO_DOWNTIME}" = "true" ]; then
+#     if [ "${BACKUP_DISK_TYPE}" = "rsync" ]; then
+#         error "BACKUP_DISK_TYPE=rsync cannot be used with BACKUP_ZERO_DOWNTIME=true"
+#         bail "Please update ${BACKUP_VARS_FILE}"
+#     fi
+#     version=($(bitbucket_version))
+#     if [ "${#version[@]}" -lt 2 ]; then
+#         error "Unable to determine the version of Bitbucket at '${BITBUCKET_URL}'"
+#         error "You need a minimum of Bitbucket 4.8 to restore a backup taken with BACKUP_ZERO_DOWNTIME=true"
+#         error "See https://confluence.atlassian.com/display/BitbucketServer/Using+Bitbucket+Zero+Downtime+Backup."
+#         bail "Please update ${BACKUP_VARS_FILE}"
+#     elif [ "${version[0]}" -lt 4 -o "${version[0]}" -eq 4 -a "${version[1]}" -lt 8 ]; then
+#         error "Bitbucket version ${version[0]}.${version[1]} does not support BACKUP_ZERO_DOWNTIME=true"
+#         error "You need a minimum of Bitbucket 4.8 to restore a backup taken with BACKUP_ZERO_DOWNTIME=true"
+#         error "See https://confluence.atlassian.com/display/BitbucketServer/Using+Bitbucket+Zero+Downtime+Backup."
+#         bail "Please update ${BACKUP_VARS_FILE}"
+#     fi
+# fi
 
 check_command "jq"
 
@@ -111,17 +111,17 @@ prepare_backup_db
 prepare_backup_disk
 
 # If necessary, lock Bitbucket, start an external backup and wait for instance readiness
-lock_bitbucket
-backup_start
+# lock_bitbucket
+# backup_start
 
 # Run Elasticsearch backup in the background (if not configured, this will be a No-Operation)
-run_in_bg backup_elasticsearch "$ES_BACKUP_JOB_NAME"
+# run_in_bg backup_elasticsearch "$ES_BACKUP_JOB_NAME"
 
-backup_wait
+# backup_wait
 
 info "Backing up the database and filesystem in parallel"
-run_in_bg "backup_db && update_backup_progress 50" "$DB_BACKUP_JOB_NAME"
-run_in_bg "backup_disk && update_backup_progress 50" "$DISK_BACKUP_JOB_NAME"
+run_in_bg "backup_db" "$DB_BACKUP_JOB_NAME"
+run_in_bg "backup_disk" "$DISK_BACKUP_JOB_NAME"
 
 {
     wait_for_bg_jobs
@@ -133,15 +133,15 @@ run_in_bg "backup_disk && update_backup_progress 50" "$DISK_BACKUP_JOB_NAME"
 }
 
 # If necessary, report 100% progress back to the application, and unlock Bitbucket
-update_backup_progress 100
-unlock_bitbucket
+# update_backup_progress 100
+# unlock_bitbucket
 
 success "Successfully completed the backup of your ${PRODUCT} instance"
 
 # Cleanup backups retaining the latest $KEEP_BACKUPS
 cleanup_old_db_backups
 cleanup_old_disk_backups
-cleanup_old_elasticsearch_backups
+# cleanup_old_elasticsearch_backups
 
 if [ -n "${BACKUP_ARCHIVE_TYPE}" ]; then
     info "Archiving backups and cleaning up old archives"

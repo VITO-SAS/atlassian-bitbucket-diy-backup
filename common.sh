@@ -4,7 +4,7 @@
 # -------------------------------------------------------------------------------------
 
 # The name of the product
-PRODUCT=Bitbucket
+PRODUCT=Jira
 BACKUP_VARS_FILE=${BACKUP_VARS_FILE:-"${SCRIPT_DIR}"/bitbucket.diy-backup.vars.sh}
 PATH=$PATH:/sbin:/usr/sbin:/usr/local/bin
 TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
