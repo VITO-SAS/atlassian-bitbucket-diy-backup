@@ -98,7 +98,7 @@ function perform_rsync_home_directory {
 
     mkdir -p "${BITBUCKET_BACKUP_HOME}"
 
-    if [ ! "${INSTANCE_TYPE}" = "bitbucket-mesh" ]; then
+    if [ "${INSTANCE_TYPE}" = "bitbucket-mesh" ]; then
         run rsync -avh ${rsync_quiet} --delete --delete-excluded \
                 --exclude=/caches/ \
                 --exclude=/log/ \
