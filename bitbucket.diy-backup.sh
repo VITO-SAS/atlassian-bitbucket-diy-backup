@@ -135,6 +135,7 @@ run_in_bg backup_disk "$DISK_BACKUP_JOB_NAME"
 {
     wait_for_bg_jobs
 } || {
+    update_backup_progress 100
     unlock_bitbucket
     cleanup_incomplete_backup || error "Failed to cleanup incomplete backup"
     error "Backing up ${PRODUCT} failed"
