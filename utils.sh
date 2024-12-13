@@ -24,7 +24,7 @@ function debug {
 # Log an error message to the console and publish it to Hipchat
 function error {
     # Set the following to have log statements print contextual information
-    echo "$(script_ctx)[$(hostname)] ERROR: $*" 1>&2
+    print "$(script_ctx)[$(hostname)] ERROR: $*" 1>&2
     hc_announce "[$(hostname)] ERROR: $*" "red" 1
 }
 
@@ -86,7 +86,7 @@ function no_op {
 
 # Log a message to the console without adding standard logging markup
 function print {
-    echo "$@"
+    echo "$(date +'%Y-%m-%d %H:%M:%S') $@"
 }
 
 function script_ctx {
@@ -151,7 +151,7 @@ function run {
 
 # Log a success message to the console and publish it to Hipchat
 function success {
-    print "[$(hostname)]  SUCC: $*"
+    print "$(script_ctx)[$(hostname)]  SUCC: $*"
     hc_announce "[$(hostname)]  SUCC: $*" "green"
 }
 
