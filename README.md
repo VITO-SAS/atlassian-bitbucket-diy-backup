@@ -12,9 +12,8 @@ backup strategy; they are not a drop-in solution for all potential configuration
 System administrators are expected to know their environment, and what technology is in use in that environment, and to
 use these example scripts to help them build their own backup solution that makes the best use of the available tools.
 
-To report bugs in the examples, [create a support request](https://support.atlassian.com/bitbucket-server/).
-
-To report suggestions for how the examples could be improved, [create a suggestion](https://jira.atlassian.com/browse/BSERV).
+* To report bugs in the examples, [create a support request](https://support.atlassian.com/contact/#/).
+* To report suggestions for how the examples could be improved, [create a suggestion](https://jira.atlassian.com/browse/BSERV).
 
 ## About these scripts
 
@@ -113,7 +112,7 @@ changes have been noted in `bitbucket.diy-backup.vars.sh.example`.
 * `BACKUP_HOME_TYPE` has been renamed to `BACKUP_DISK_TYPE`
 * `STANDBY_HOME_TYPE` has been renamed to `STANDBY_DISK_TYPE`
 
-####`amazon-ebs` strategy ####
+#### `amazon-ebs` strategy ####
 * A new `EBS_VOLUME_MOUNT_POINT_AND_DEVICE_NAMES` variable has been introduced, which is an array of all EBS volumes 
   (the shared home directory, and any configured data stores). It needs to contain the details for the shared home that
   were previously stored in `HOME_DIRECTORY_MOUNT_POINT` and `HOME_DIRECTORY_DEVICE_NAME`.
