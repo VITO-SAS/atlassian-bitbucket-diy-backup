@@ -267,6 +267,10 @@ if [ "amazon-ebs" = "${BACKUP_DISK_TYPE}" -o "amazon-rds" = "${BACKUP_DATABASE_T
 
     AWS_INFO=$(curl ${CURL_OPTIONS} http://169.254.169.254/latest/dynamic/instance-identity/document)
 
+    # Use the following when IMDSv2 is enabled; please refer to https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/retrieve-iid.html.
+    # TOKEN=$(curl -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 21600" -s http://169.254.169.254/latest/api/token)
+    # AWS_INFO=$(curl ${CURL_OPTIONS} -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/dynamic/instance-identity/document)
+
     # The AWS account ID of the instance. Used to create Amazon Resource Names (ARNs)
     AWS_ACCOUNT_ID=$(echo "${AWS_INFO}" | jq -r .accountId)
 
