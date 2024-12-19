@@ -224,7 +224,8 @@ function remount_ebs_volumes {
             local mount_point="$(echo "${volume}" | cut -d ":" -f1)"
             local device_name="$(echo "${volume}" | cut -d ":" -f2)"
             if ! mountpoint -q "${mount_point}"; then
-                run sudo mount "${device_name}" "${mount_point}"
+                local filesystem_device="$(find_filesystem_device "${device_name}")"
+                run sudo mount "${filesystem_device}" "${mount_point}"
             fi
         done
 
@@ -305,6 +306,28 @@ function find_attached_ebs_volume {
     fi
 
     echo "${ebs_volume}"
+}
+
+# Find the relevant attached filesystem device
+# Amazon EBS volumes are exposed as NVMe block devices on Amazon EC2 instances built on the AWS Nitro System, please
+# refer to https://docs.aws.amazon.com/ebs/latest/userguide/nvme-ebs-volumes.html for more details.
+function find_filesystem_device {
+    local device_name="${1}"
+    local ec2_instance_family=$(echo "${AWS_EC2_INSTANCE_TYPE^^}" |  cut -d'.' -f1)
+
+    if [[ "${AWS_XEN_INSTANCE_TYPES[@]}" =~ "${ec2_instance_family}" ]]; then
+        echo "${device_name}"
+    else
+        check_command "nvme"
+
+        for filesystem_device in $(sudo nvme list -o json | jq -r '.Devices[].DevicePath'); do
+            local nvme_device_name=$(sudo nvme id-ctrl -v ${filesystem_device} | grep '^0000:' | awk -F'"' '{print $2}' | tr -d '.')
+            if [ ${nvme_device_name} = ${device_name} ]; then
+                echo "${filesystem_device}"
+                break
+            fi
+        done
+    fi
 }
 
 # List available EBS restore points
