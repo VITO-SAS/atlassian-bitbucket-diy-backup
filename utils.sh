@@ -24,7 +24,7 @@ function debug {
 # Log an error message to the console
 function error {
     # Set the following to have log statements print contextual information
-    echo "$(script_ctx)[$(hostname)] ERROR: $*" 1>&2
+    print "$(script_ctx)[$(hostname)] ERROR: $*" 1>&2
 }
 
 # Log an info message to the console
@@ -84,7 +84,7 @@ function no_op {
 
 # Log a message to the console without adding standard logging markup
 function print {
-    echo "$@"
+    echo "$(date +'%Y-%m-%d %H:%M:%S') $@"
 }
 
 function script_ctx {
@@ -149,5 +149,5 @@ function run {
 
 # Log a success message to the console
 function success {
-    print "[$(hostname)]  SUCC: $*"
+    print "$(script_ctx)[$(hostname)]  SUCC: $*"
 }
