@@ -27,6 +27,11 @@ RESTORE_DISK_VOLUME_TYPE=gp2
 CURL_OPTIONS="-L -s -f"
 
 AWS_INFO=$(curl ${CURL_OPTIONS} http://169.254.169.254/latest/dynamic/instance-identity/document)
+
+# Use the following when IMDSv2 is enabled; please refer to https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/retrieve-iid.html.
+# TOKEN=$(curl -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 21600" -s http://169.254.169.254/latest/api/token)
+# AWS_INFO=$(curl ${CURL_OPTIONS} -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/dynamic/instance-identity/document)
+
 AWS_ACCOUNT_ID=$(echo "${AWS_INFO}" | jq -r .accountId)
 AWS_AVAILABILITY_ZONE=$(echo "${AWS_INFO}" | jq -r .availabilityZone)
 AWS_REGION=$(echo "${AWS_INFO}" | jq -r .region)
@@ -34,10 +39,6 @@ AWS_EC2_INSTANCE_ID=$(echo "${AWS_INFO}" | jq -r .instanceId)
 AWS_ADDITIONAL_TAGS=
 
 BITBUCKET_VERBOSE_BACKUP=true
-
-HIPCHAT_URL=https://api.hipchat.com
-HIPCHAT_ROOM=
-HIPCHAT_TOKEN=
 
 KEEP_BACKUPS=5
 FILESYSTEM_TYPE=zfs
