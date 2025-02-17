@@ -27,7 +27,7 @@ function prepare_restore_db {
     # Since the whole database is restored implicitly as part of the file system volume, this function doesn't need
     # to do any work.  All we need to do is stop the service beforehand.
     run sudo systemctl stop "${POSTGRESQL_SERVICE_NAME}"
-    # Added Sleep so the Mount isn't reported as Busy during restore
+        # Added Sleep so the Mount isn't reported as Busy during restore
     sleep 5
     # Add a clean up routine to ensure we always start the PostgreSQL service back up again
     add_cleanup_routine restore_db

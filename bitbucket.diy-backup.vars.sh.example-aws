@@ -31,7 +31,10 @@ AWS_ACCOUNT_ID=$(echo "${AWS_INFO}" | jq -r .accountId)
 AWS_AVAILABILITY_ZONE=$(echo "${AWS_INFO}" | jq -r .availabilityZone)
 AWS_REGION=$(echo "${AWS_INFO}" | jq -r .region)
 AWS_EC2_INSTANCE_ID=$(echo "${AWS_INFO}" | jq -r .instanceId)
+AWS_EC2_INSTANCE_TYPE=$(echo "${AWS_INFO}" | jq -r .instanceType)
 AWS_ADDITIONAL_TAGS=
+
+AWS_XEN_INSTANCE_TYPES=("M1" "M2" "M3" "M4" "T1" "T2" "C1" "C3" "C4" "R3" "R4" "X1" "X1e" "D2" "H1" "I2" "I3" "F1" "G3" "P2" "P3")
 
 BITBUCKET_VERBOSE_BACKUP=true
 

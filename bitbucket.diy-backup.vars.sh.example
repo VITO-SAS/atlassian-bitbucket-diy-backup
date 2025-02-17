@@ -279,6 +279,9 @@ if [ "amazon-ebs" = "${BACKUP_DISK_TYPE}" -o "amazon-rds" = "${BACKUP_DATABASE_T
     # The EC2 instance ID
     AWS_EC2_INSTANCE_ID=$(echo "${AWS_INFO}" | jq -r .instanceId)
 
+    # The EC2 instance type
+    AWS_EC2_INSTANCE_TYPE=$(echo "${AWS_INFO}" | jq -r .instanceType)
+
     # Additional AWS tags for EBS and RDS snapshot, tags needs to be in JSON format without enclosing square brackets:
     # Example: AWS_ADDITIONAL_TAGS='{"Key":"example_key", "Value":"example_value"}'
     AWS_ADDITIONAL_TAGS=
@@ -286,6 +289,10 @@ if [ "amazon-ebs" = "${BACKUP_DISK_TYPE}" -o "amazon-rds" = "${BACKUP_DATABASE_T
     # Ensure we fsfreeze while snapshots of ebs volumes are taken
     FSFREEZE=true
 fi
+
+# It's not possible to programmatically obtain the Xen-based instance types in AWS, hence we are hard-coding them here.
+# The list is manually generated based on https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html#instance-hypervisor-type.
+AWS_XEN_INSTANCE_TYPES=("M1" "M2" "M3" "M4" "T1" "T2" "C1" "C3" "C4" "R3" "R4" "X1" "X1e" "D2" "H1" "I2" "I3" "F1" "G3" "P2" "P3")
 
 # Used by the scripts for verbose logging. If not true only errors will be shown.
 BITBUCKET_VERBOSE_BACKUP=${BITBUCKET_VERBOSE_BACKUP:-true}

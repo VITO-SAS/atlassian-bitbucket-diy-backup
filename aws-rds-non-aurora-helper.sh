@@ -67,20 +67,20 @@ function restore_rds_snapshot {
     if [ "${RESTORE_RDS_MULTI_AZ}" = "true" ]; then
         optional_args="${optional_args} --multi-az"
     fi
-
+    if [ -n "${RESTORE_RDS_SECURITY_GROUP}" ]; then
+        optional_args="${optional_args} --vpc-security-group-ids ${RESTORE_RDS_SECURITY_GROUP}"
+    fi
     local renamed_rds_instance="${RDS_INSTANCE_ID}-${TIMESTAMP}"
     rename_rds_instance "${RDS_INSTANCE_ID}" "${renamed_rds_instance}"
 
     info "Attempting to restore RDS snapshot '${RESTORE_RDS_SNAPSHOT_ID}' as RDS instance '${RDS_INSTANCE_ID}'"
-
     # Bail after 10 Minutes
     local max_wait_time=600
     local end_time=$((SECONDS + max_wait_time))
-
     while [ $SECONDS -lt ${end_time} ]; do
         local restore_result=$(aws rds restore-db-instance-from-db-snapshot \
                 --db-instance-identifier "${RDS_INSTANCE_ID}" \
-                --db-snapshot-identifier "${RESTORE_RDS_SNAPSHOT_ID}" "${optional_args}" 2>&1)
+                --db-snapshot-identifier "${RESTORE_RDS_SNAPSHOT_ID}" ${optional_args} 2>&1)
 
         case ${restore_result} in
         *"\"DBInstanceStatus\": \"creating\""*)

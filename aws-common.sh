@@ -311,9 +311,8 @@ function find_filesystem_device {
         echo "${device_name}"
     else
         check_command "nvme"
-        set -ex
         for filesystem_device in $(sudo nvme list -o json | jq -r '.Devices[].DevicePath'); do
-	    local nvme_device_name=$(sudo nvme id-ctrl --vendor-specific ${filesystem_device} | grep '^0000:' | awk -F'"' '{print $2}' | tr -d '.')
+            local nvme_device_name=$(sudo nvme id-ctrl ${filesystem_device} -V amzn | grep '^0000:' | awk -F'"' '{print $2}' | tr -d '.')
             if [ ${nvme_device_name} = ${device_name} ]; then
                 echo "${filesystem_device}"
                 break
