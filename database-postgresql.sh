@@ -38,7 +38,14 @@ function prepare_restore_db {
     check_config_var "POSTGRES_PORT"
     check_var "BITBUCKET_RESTORE_DB"
 
-    if run psql -U "${POSTGRES_USERNAME}" -h "${POSTGRES_HOST}" --port=${POSTGRES_PORT} -d "${BITBUCKET_DB}" -c ""; then
+    if run psql -U "${POSTGRES_USERNAME}" -h "${POSTGRES_HOST}" --port=${POSTGRES_PORT} -c "" 2>/dev/null; then
+        info "Database server is reachable"
+    else
+        error "Failed to connect to the database server '${POSTGRES_HOST}:${POSTGRES_PORT}'"
+        bail "Cannot proceed because the database connection could not be established."
+    fi
+
+    if run psql -U "${POSTGRES_USERNAME}" -h "${POSTGRES_HOST}" --port=${POSTGRES_PORT} -d "${BITBUCKET_DB}" -c "" 2>/dev/null; then
         local table_count=$(psql -U "${POSTGRES_USERNAME}" -h "${POSTGRES_HOST}" --port=${POSTGRES_PORT} -d "${BITBUCKET_DB}" -tqc '\dt' | grep -v "^$" | wc -l)
         if [ "${table_count}" -gt 0 ]; then
             error "Database '${BITBUCKET_DB}' already exists and contains ${table_count} tables"
@@ -46,9 +53,6 @@ function prepare_restore_db {
             error "Database '${BITBUCKET_DB}' already exists"
         fi
         bail "Cannot restore over existing database '${BITBUCKET_DB}', please ensure it does not exist before restoring"
-    else
-        error "Failed to connect to the database '${BITBUCKET_DB}'"
-        bail "Cannot proceed because the database connection could not be established."
     fi
 }
 
