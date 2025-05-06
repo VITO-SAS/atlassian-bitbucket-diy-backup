@@ -50,6 +50,9 @@ function lock_bitbucket {
             Could not find 'unlockToken' in response '${lock_response}'"
     fi
 
+    info "Sleep for 15 seconds to make sure lock task has completed."
+    /usr/bin/sleep 15;
+
     add_cleanup_routine unlock_bitbucket
 
     info "Bitbucket has been locked for maintenance.  It can be unlocked with:"
@@ -69,11 +72,14 @@ function backup_start {
         bail "Unable to enter backup mode. POST to '${BITBUCKET_URL}/mvc/admin/backups?external=true' \
             returned '${backup_response}'"
     fi
-
+    
     BITBUCKET_BACKUP_TOKEN=$(echo "${backup_response}" | jq -r ".cancelToken" | tr -d '\r')
     if [ -z "${BITBUCKET_BACKUP_TOKEN}" ]; then
         bail "Unable to enter backup mode. Could not find 'cancelToken' in response '${backup_response}'"
     fi
+
+    info "Sleep for 15 seconds to make sure backup task has started."
+    /usr/bin/sleep 15;
 
     info "Bitbucket server is now preparing for backup. If the backup task is cancelled, Bitbucket Server should be notified that backup was terminated by executing the following command:"
     info "    curl -u ... -X POST -H 'Content-type:application/json' '${BITBUCKET_URL}/mvc/maintenance?token=${BITBUCKET_BACKUP_TOKEN}'"
@@ -95,7 +101,7 @@ function backup_wait {
         # The following curl command is not executed with run to suppress the polling spam of messages
         local progress_response=$(curl ${CURL_OPTIONS} -u "${BITBUCKET_BACKUP_USER}:${BITBUCKET_BACKUP_PASS}" -X GET \
             -H "X-Atlassian-Maintenance-Token: ${BITBUCKET_LOCK_TOKEN}" -H "Accept: application/json" \
-            -H "Content-type: application/json" "${BITBUCKET_URL}/mvc/maintenance")
+            -H "Content-type: application/json" "${BITBUCKET_URL}/mvc/maintenance" || echo '{"task":{"state":"UNKNOWN"},"db-state":"UNKNOWN","scm-state":"UNKNOWN"}')
         if [ -z "${progress_response}" ]; then
             bail "Unable to check for backup progress. \
                 GET to '${BITBUCKET_URL}/mvc/maintenance' did not return any content"
@@ -199,6 +205,9 @@ function unlock_bitbucket {
 
     remove_cleanup_routine unlock_bitbucket
 
+    info "Sleep for 15 seconds to make sure bitbucket can be unlocked."
+    /usr/bin/sleep 15;
+    
     run curl ${CURL_OPTIONS} -u "${BITBUCKET_BACKUP_USER}:${BITBUCKET_BACKUP_PASS}" -X DELETE -H "Accept: application/json" \
         -H "Content-type: application/json" "${BITBUCKET_URL}/mvc/maintenance/lock?token=${BITBUCKET_LOCK_TOKEN}"
 }
